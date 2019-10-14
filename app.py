@@ -31,6 +31,12 @@ def findQuery(table, id):
 def findAllQuery(table):
     return ("SELECT * FROM {}".format(table))
 
+def insertPeopleQuery(args):
+    return ("INSERT INTO {} (`firstname`, `lastname`) VALUES ('{}', '{}')".format(args.context, args.firstname, args.lastname))
+
+def insertMovieQuery(args):
+    return ("INSERT INTO {} (`title`, `original_title`, `duration`) VALUES ('{}', '{}', {})".format(args.context, args.title, args.original_title, args.duration))
+
 def find(table, id):
     cnx = connectToDatabase()
     cursor = createCursor(cnx)
@@ -50,6 +56,22 @@ def findAll(table):
     disconnectDatabase(cnx)
     return results
 
+def insertPeople(args):
+    cnx = connectToDatabase()
+    cursor = createCursor(cnx)
+    cursor.execute(insertPeopleQuery(args))
+    cnx.commit()
+    closeCursor(cursor)
+    disconnectDatabase(cnx)
+
+def insertMovie(args):
+    cnx = connectToDatabase()
+    cursor = createCursor(cnx)
+    cursor.execute(insertMovieQuery(args))
+    cnx.commit()
+    closeCursor(cursor)
+    disconnectDatabase(cnx)
+
 def printPerson(person):
     print("#{}: {} {}".format(person['id'], person['firstname'], person['lastname']))
 
@@ -67,6 +89,13 @@ list_parser.add_argument('--export' , help='Chemin du fichier exportÃ©')
 
 find_parser = action_subparser.add_parser('find', help='Trouve une entitÃ© selon un paramÃ¨tre')
 find_parser.add_argument('id' , help='Identifant Ã  rechercher')
+
+insert_parser = action_subparser.add_parser('insert', help='Insert name')
+insert_parser.add_argument('--firstname', help='firstName of people to insert')
+insert_parser.add_argument('--lastname', help='LastName of people to insert')
+insert_parser.add_argument('--title' , help='Le titre de l\'entité')
+insert_parser.add_argument('--original_title' , help='La durée de l\'entité')
+insert_parser.add_argument('--duration' , help='La durée de l\'entité')
 
 args = parser.parse_args()
 
@@ -87,6 +116,8 @@ if args.context == "people":
         people = find("people", peopleId)
         for person in people:
             printPerson(person)
+    if args.action == "insert":
+        insertPeople(args)
 
 if args.context == "movies":
     if args.action == "list":  
@@ -98,3 +129,5 @@ if args.context == "movies":
         movies = find("movies", movieId)
         for movie in movies:
             printMovie(movie)
+    if args.action == "insert":
+        insertMovie(args)
