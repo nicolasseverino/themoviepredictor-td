@@ -34,6 +34,9 @@ def findAllQuery(table):
 def insertPeopleQuery(args):
     return ("INSERT INTO {} (`firstname`, `lastname`) VALUES ('{}', '{}')".format(args.context, args.firstname, args.lastname))
 
+def insertEntireMovieQuery(args):
+    return ("INSERT INTO {} (`title`, `original_title`, `duration`, `rating`, `release_date`) VALUES ('{}', '{}', {}, '{}', '{}')".format(args.context, args.title, args.original_title, args.duration))
+
 def insertMovieQuery(args):
     return ("INSERT INTO {} (`title`, `original_title`, `duration`) VALUES ('{}', '{}', {})".format(args.context, args.title, args.original_title, args.duration))
 
@@ -136,11 +139,11 @@ if args.context == "movies":
         insertMovie(args)
     if args.action == "import":
         if args.files:
-            with open(args.files, 'w', encoding='utf-8', newline='\n') as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(people[0].keys())
-                for person in people:
-                    writer.writerow(person.values())
+            with open(args.files, 'r', encoding='utf-8', newline='') as csvfile:
+                reader = csv.DictReader(csvfile, delimiter=',')
+                for row in reader:
+                    print(row['title'],row['original_title'],row['duration'],row['release_date'])
+                    
         else:
             for person in people:
                 printPerson(person)
