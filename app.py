@@ -84,18 +84,21 @@ parser.add_argument('context', choices=['people', 'movies'], help='Le contexte d
 
 action_subparser = parser.add_subparsers(title='action', dest='action')
 
-list_parser = action_subparser.add_parser('list', help='Liste les entitÃ©es du contexte')
-list_parser.add_argument('--export' , help='Chemin du fichier exportÃ©')
+list_parser = action_subparser.add_parser('list', help='Liste les entités du contexte')
+list_parser.add_argument('--export' , help='Chemin du fichier exporté')
 
-find_parser = action_subparser.add_parser('find', help='Trouve une entitÃ© selon un paramÃ¨tre')
-find_parser.add_argument('id' , help='Identifant Ã  rechercher')
+find_parser = action_subparser.add_parser('find', help='Trouve une entité selon un paramètre')
+find_parser.add_argument('id' , help='Identifant à rechercher')
 
-insert_parser = action_subparser.add_parser('insert', help='Insert name')
-insert_parser.add_argument('--firstname', help='firstName of people to insert')
-insert_parser.add_argument('--lastname', help='LastName of people to insert')
-insert_parser.add_argument('--title' , help='Le titre de l\'entité')
-insert_parser.add_argument('--original_title' , help='La durée de l\'entité')
-insert_parser.add_argument('--duration' , help='La durée de l\'entité')
+insert_parser = action_subparser.add_parser('insert', help='Insérer une personne')
+insert_parser.add_argument('--firstname', help='Prénom de la personne à insérer')
+insert_parser.add_argument('--lastname', help='Nom de la personne à insérer')
+insert_parser.add_argument('--title' , help='Le titre du film')
+insert_parser.add_argument('--original_title' , help='Le titre original du film')
+insert_parser.add_argument('--duration' , help='La durée du film')
+
+import_parser = action_subparser.add_parser('import', help='Importe un fichier csv')
+import_parser.add_argument('--files' , help='Fichier à importer')
 
 args = parser.parse_args()
 
@@ -131,3 +134,13 @@ if args.context == "movies":
             printMovie(movie)
     if args.action == "insert":
         insertMovie(args)
+    if args.action == "import":
+        if args.files:
+            with open(args.files, 'w', encoding='utf-8', newline='\n') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(people[0].keys())
+                for person in people:
+                    writer.writerow(person.values())
+        else:
+            for person in people:
+                printPerson(person)
